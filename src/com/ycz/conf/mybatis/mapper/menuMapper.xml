@@ -21,12 +21,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
              and parent_id=#{parentId}
           </if>
        </where>
-               limit #{offset},#{pageSize}
+           limit #{offset},#{pageSize}
     </select>
     
     <!-- 获取顶级菜单信息 -->
     <select id="findTopList" resultType="com.ycz.pojo.Menu" parameterType="map">
-       select * from menu where parent_id=-1
+       select * from menu where parent_id=0
+    </select>
+    
+    <!-- 获取子级菜单信息 -->
+    <select id="findChildren" resultType="com.ycz.pojo.Menu" parameterType="long">
+       select * from menu where parent_id=#{id}
     </select>
     
     <!-- 获取总记录条数 -->
@@ -41,4 +46,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
           </if>
        </where>
     </select>
+    
+    <!-- 修改记录 -->
+    <update id="edit" parameterType="com.ycz.pojo.Menu">
+        update menu set parent_id=#{parentId},name=#{name},url=#{url},icon=#{icon}
+        where id=#{id}
+    </update>
+    
+    <!-- 删除记录 -->
+    <delete id="deleteMenu" parameterType="long">
+       delete from menu where id=#{id}
+    </delete>
+    
 </mapper>

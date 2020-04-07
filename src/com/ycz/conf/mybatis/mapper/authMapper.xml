@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ycz.dao.AuthorityDao">
+
+    <!-- 添加权限 -->
+    <insert id="add" parameterType="com.ycz.pojo.Authority">
+        insert into authority(role_id,menu_id) values(#{roleId},#{menuId})
+    </insert>
+    
+    <!-- 查询权限 -->
+    <select id="findListByRoleId" resultType="com.ycz.pojo.Authority" parameterType="long">
+        select * from authority 
+       <where>
+          <if test="roleId!=null">
+             and role_id=#{roleId}
+          </if>
+       </where>
+    </select>
+    
+</mapper>

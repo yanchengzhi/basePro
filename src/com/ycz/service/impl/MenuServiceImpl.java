@@ -36,4 +36,19 @@ public class MenuServiceImpl implements MenuService {
         return mDao.getTotal(map);
     }
 
+    @Override
+    public void edit(Menu menu) {
+        mDao.edit(menu);
+    }
+
+    @Override
+    public void deleteMenu(Long id) {
+        mDao.deleteMenu(id);
+    }
+
+    @Override
+    public List<Menu> findChildren(Long id) {
+        return mDao.findChildren(id);
+    }
+
 }

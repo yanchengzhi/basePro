@@ -15,7 +15,19 @@ public class Menu {
     private String name;//菜单名称
     private String url;//url地址
     private String icon;//图标
+    private Long _parentId;//用来匹配easyui框架中的父类ID
     
+    
+    public Long get_parentId() {
+        _parentId = parentId;//需要和parentId保持一致
+        return _parentId;
+    }
+
+    
+    public void set_parentId(Long _parentId) {
+        this._parentId = _parentId;
+    }
+
     public Long getId() {
         return id;
     }

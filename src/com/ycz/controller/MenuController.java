@@ -63,7 +63,7 @@ public class MenuController {
         AjaxResult result = new AjaxResult();
         try {
             if(menu.getParentId()==null) {
-                menu.setParentId(-1L);
+                menu.setParentId(0L);
             }
             mService.add(menu);
             result.setSuccess(true);
@@ -72,6 +72,51 @@ public class MenuController {
             result.setSuccess(false);
         }
         return result;
+    }
+    
+    /**
+     * 
+     * @Description (菜单修改)
+     * @param menu
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("edit")
+    public AjaxResult edit(Menu menu) {
+        AjaxResult result = new AjaxResult();
+        try {
+            if(menu.getParentId()==null) {
+                menu.setParentId(0L);
+            }
+            mService.edit(menu);
+            result.setSuccess(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setSuccess(false);
+        }
+        return result;
+    }
+    
+    /**
+     * 
+     * @Description (菜单删除)
+     * @param id
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("delete")
+    public AjaxResult delete(Long id) {
+        AjaxResult result2 = new AjaxResult();
+            //查询是否为父级菜单
+            List<Menu> childrenList = mService.findChildren(id);
+            if(childrenList.size()==0) {//不为父级菜单执行删除
+                mService.deleteMenu(id);
+                result2.setSuccess(true);
+            }else {
+                result2.setData("无法删除父级菜单！");
+                result2.setSuccess(false);
+            }
+        return result2;
     }
     
     /**
@@ -100,6 +145,12 @@ public class MenuController {
         return ret;
     }
     
+    /**
+     * 
+     * @Description (获取图标名称，传给前端)
+     * @param request
+     * @return
+     */
     @ResponseBody
     @RequestMapping("getIcons")
     public AjaxResult getIcons(HttpServletRequest request) {
@@ -119,9 +170,6 @@ public class MenuController {
               if(f!=null && f.getName().contains(".png")) {
                   String str = f.getName().substring(0,f.getName().indexOf(".")).replace("_", "-");//截取字符串
                   icons.add("icon-"+str);
-                  if(icons.size()==504) {//限定504个图标
-                      break;
-                  }
               } 
             }
             result.setData(icons);

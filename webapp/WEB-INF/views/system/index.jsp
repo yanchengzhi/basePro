@@ -12,8 +12,24 @@
 <script type="text/javascript" src="${APP_PATH}/static/easyui/js/jquery-1.8.0.min.js"></script>
 <script type="text/javascript" src="${APP_PATH}/static/easyui/easyui/1.3.4/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="${APP_PATH}/static/easyui/easyui/1.3.4/locale/easyui-lang-zh_CN.js"></script>
+<script>
+    var pc; 
+    $.parser.onComplete = function () {
+        if (pc) clearTimeout(pc);
+        pc = setTimeout(closes, 1000);
+    } 
+
+    function closes() {
+        $('#loading').fadeOut('normal', function () {
+            $(this).remove();
+        });
+    }
+</script>
 </head>
 <body class="easyui-layout">
+     <div id="loading" style="position:absolute;z-index:1000;top:0;left:0;width:100%;height:100%;background:white;text-align :center;padding-top:7%;">
+     <img alt="" src="${APP_PATH}/static/h-ui/images/loadingouter.gif">
+     </div>
 	<!-- begin of header -->
 	<div class="wu-header" data-options="region:'north',border:false,split:true">
     	<div class="wu-header-left">
@@ -91,6 +107,7 @@
             <div title="系统设置" data-options="iconCls:'icon-wrench'" style="padding:5px;">  	
     			<ul class="easyui-tree wu-side-tree">
                 	<li iconCls="icon-chart-organisation"><a href="javascript:void(0)" data-icon="icon-chart-organisation" data-link="${APP_PATH}/menu/list" iframe="0">菜单管理</a></li>
+                    <li iconCls="icon-user-group"><a href="javascript:void(0)" data-icon="icon-chart-organisation" data-link="${APP_PATH}/role/list" iframe="1">角色管理</a></li>
                 </ul>
             </div>
         </div>
@@ -120,36 +137,6 @@
 				addTab(title,url,iconCls,iframe);
 			});	
 		})
-		
-		/**
-		* Name 载入树形菜单 
-		*/
-		$('#wu-side-tree').tree({
-			url:'temp/menu.php',
-			cache:false,
-			onClick:function(node){
-				var url = node.attributes['url'];
-				if(url==null || url == ""){
-					return false;
-				}
-				else{
-					addTab(node.text, url, '', node.attributes['iframe']);
-				}
-			}
-		});
-		
-		/**
-		* Name 选项卡初始化
-		*/
-		$('#wu-tabs').tabs({
-			tools:[{
-				iconCls:'icon-reload',
-				border:false,
-				handler:function(){
-					$('#wu-datagrid').datagrid('reload');
-				}
-			}]
-		});
 			
 		/**
 		* Name 添加菜单选项

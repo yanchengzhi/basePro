@@ -15,4 +15,10 @@ public interface MenuDao {
 
     int getTotal(Map<String, Object> map);
 
+    void edit(Menu menu);
+
+    void deleteMenu(Long id);
+
+    List<Menu> findChildren(Long id);
+
 }
