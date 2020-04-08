@@ -48,7 +48,21 @@
             <a href="#" class="easyui-linkbutton" iconCls="icon-remove" onclick="remove()" plain="true">删除</a>
         </div>
         <div class="wu-toolbar-search">
-            <label>角色名称：</label><input class="wu-text" id="search-name" style="width:100px">
+            <label>用户名：</label><input class="wu-text" id="search-name" style="width:100px">&nbsp;&nbsp;&nbsp;
+            <label>所属角色：</label>
+            <select class="easyui-combobox" id="search-role" name="role" panelHeight="auto" style="width:120px">
+                <!-- 遍历父菜单 -->
+                <option>全部</option>
+                <c:forEach items="${roleList}" var="role">
+                   <option value="${role.id}">${role.name}</option>
+                </c:forEach>
+             </select>&nbsp;&nbsp;&nbsp;
+             <label>性别：</label>
+            <select class="easyui-combobox" id="search-sex" name="sex" panelHeight="auto" style="width:120px">
+                <option>全部</option>
+                <option value="0">女</option>
+                <option value="1">男</option>
+             </select>
             <a href="#" class="easyui-linkbutton" id="search-btn" iconCls="icon-search">搜索</a>
         </div>
     </div>
@@ -60,13 +74,40 @@
 	<form id="add-form" method="post">
         <table>
             <tr>
-                <td width="60" align="right">角色名称:</td>
-                <td><input type="text" name="name" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写角色名称！' "/></td>
+                <td width="60" align="right">用户名:</td>
+                <td><input type="text" name="username" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写用户名！' "/></td>
             </tr>           
             <tr>
-                <td valign="top" align="right">角色备注:</td>
-                <td><textarea name="remark" rows="6" class="wu-textarea" style="width:260px"></textarea></td>
+                <td align="right">密码:</td>
+                <td><input type="text" name="password" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请设置密码！' "/></td>
             </tr>
+            <tr>
+               <td align="right">用户角色:</td>
+               <td>
+                   <select class="easyui-combobox" id="roleId" name="roleId" panelHeight="auto" style="width:268px"> 
+                     <c:forEach items="${roleList}" var="role">
+                     <option value="${role.id}">${role.name}</option>
+                     </c:forEach>
+                   </select>
+               </td>
+            </tr>
+            <tr>
+               <td align="right">性别:</td>
+               <td>
+                   <select class="easyui-combobox" id="sex" name="sex" panelHeight="auto" style="width:268px" data-options="required:true,missingMessage:'请选择年龄！' "> 
+                     <option value="1">男</option>
+                     <option value="0">女</option>                   
+                   </select>
+               </td>
+            </tr>
+            <tr>
+                <td width="60" align="right">年龄:</td>
+                <td><input type="text" name="age" class="wu-text easyui-numberbox easyui-validatebox" data-options="required:true,min:1,precision:0,missingMessage:'请填写年龄！' "/></td>
+            </tr> 
+            <tr>
+                <td width="60" align="right">住址:</td>
+                <td><input type="text" name="address" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写住址！' "/></td>
+            </tr> 
         </table>
     </form>
 </div>
@@ -108,7 +149,7 @@
 		//序列化表单数据
 		var data = $('#add-form').serialize();
 		$.ajax({
-			url:'${APP_PATH}/role/add',
+			url:'${APP_PATH}/user/addUser',
 			type:"POST",
 			data:data,
 			success:function(result){
@@ -118,7 +159,7 @@
 					//添加成功后重载数据
 					$('#data-datagrid').datagrid('reload');
 				}else{
-					$.messager.alert('信息提示','添加失败！','info');
+					$.messager.alert('信息提示',result.data,'info');
 				}
 			}
 		});
@@ -455,7 +496,7 @@
 	* Name 载入数据
 	*/
 	$('#data-datagrid').datagrid({
-		url:'${APP_PATH}/role/listData',
+		url:'${APP_PATH}/user/listData',
 		rownumbers:true,//是否显示行号
 		singleSelect:true,//是否只支持单选
 		pageSize:20,//每页显示的记录条数           
@@ -465,13 +506,12 @@
 		fit:true,
 		columns:[[
 			{ field:'chk',checkbox:true},
-			{ field:'name',title:'角色名称',width:100,sortable:true},
-			{ field:'remark',title:'角色备注',width:180,sortable:true},
-			//icon图标添加一个预览功能
-			{ field:'icon',title:'角色权限',width:100,formatter:function(value,row,index){
-				var test = '<a class="authority-edit" onclick="selectAuth('+row.id+')"></a>';
-				return test;
-			}}
+			{ field:'username',title:'用户名',width:100,sortable:true},
+			{ field:'roleId',title:'所属角色',width:180,sortable:true},
+			{ field:'photo',title:'头像地址',width:180,sortable:true},
+			{ field:'sex',title:'性别',width:180,sortable:true},
+			{ field:'age',title:'年龄',width:180,sortable:true},
+			{ field:'address',title:'住址',width:180,sortable:true},
 		]],
 		//将文字内容加入到按钮中，连接为一个整体
 		onLoadSuccess:function(data){

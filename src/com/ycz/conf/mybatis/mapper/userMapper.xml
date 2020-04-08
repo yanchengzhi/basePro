@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ycz.dao.UserDao">
+   
+   <!-- 添加用户 -->
+   <insert id="addUser" parameterType="com.ycz.pojo.User">
+     insert into user(username,password,role_id,photo,sex,age,address) values(
+     #{username},#{password},#{roleId},#{photo},#{sex},#{age},#{address}
+     )
+   </insert>
+   
+   <!-- 批量删除用户 -->
+   <delete id="deleteUser" parameterType="String">
+      delete from user where id in(${ids})
+   </delete>
+   
+   <!-- 修改用户 -->
+   <update id="editUser" parameterType="com.ycz.pojo.User">
+      update user set username=#{username},role_id=#{roleId},photo=#{photo},
+      sex=#{sex},age=#{age},address=#{address} where id=#{id}
+   </update>
+   
+   <!-- 分页查询 -->
+   <select id="findList" resultType="com.ycz.pojo.User" parameterType="map">
+      select * from user
+      <where>
+         <if test="username!=null">
+            and username like concat('%',#{username},'%')
+         </if>
+         <if test="roleId!=null">
+            and role_id=#{roleId}
+         </if>
+         <if test="sex!=null">
+            and sex=#{sex}
+         </if>
+      </where>
+       limit #{offset},#{pageSize}
+   </select>
+   
+   <!-- 查询总记录条数 -->
+   <select id="getTotal" resultType="int" parameterType="map">
+      select count(*) from user
+      <where>
+         <if test="username!=null">
+            and username like concat('%',#{username},'%')
+         </if>
+         <if test="roleId!=null">
+            and role_id=#{roleId}
+         </if>
+         <if test="sex!=null">
+            and sex=#{sex}
+         </if>
+      </where>
+   </select>
+   
+</mapper>

@@ -94,14 +94,9 @@
                     <li iconCls="icon-application-osx-error"><a href="javascript:void(0)" data-icon="icon-application-osx-error" data-link="temp/layout-3.html" iframe="0">导航标题</a></li>
                 </ul>
             </div>
-            <div title="报表中心" data-options="iconCls:'icon-chart-curve'" style="padding:5px;">  	
+            <div title="用户管理" data-options="iconCls:'icon-user'" style="padding:5px;">  	
     			<ul class="easyui-tree wu-side-tree">
-                	<li iconCls="icon-chart-organisation"><a href="javascript:void(0)" data-icon="icon-chart-organisation" data-link="layout-3.html" iframe="0">导航标题</a></li>
-                    <li iconCls="icon-users"><a href="javascript:void(0)" data-icon="icon-users" data-link="temp/layout-3.html" iframe="0">导航标题</a></li>
-                    <li iconCls="icon-user-group"><a href="javascript:void(0)" data-icon="icon-user-group" data-link="temp/layout-3.html" iframe="0">导航标题</a></li>
-                    <li iconCls="icon-book"><a href="javascript:void(0)" data-icon="icon-book" data-link="temp/layout-3.html" iframe="0">导航标题</a></li>
-                    <li iconCls="icon-cog"><a href="javascript:void(0)" data-icon="icon-cog" data-link="temp/layout-3.html" iframe="0">导航标题</a></li>
-                    <li iconCls="icon-application-osx-error"><a href="javascript:void(0)" data-icon="icon-application-osx-error" data-link="temp/layout-3.html" iframe="0">导航标题</a></li>
+                	<li iconCls="icon-user"><a href="javascript:void(0)" data-icon="icon-user" data-link="${APP_PATH}/user/list" iframe="0">用户管理</a></li>
                 </ul>
             </div>
             <div title="系统设置" data-options="iconCls:'icon-wrench'" style="padding:5px;">  	
@@ -124,7 +119,7 @@
     <!-- end of main --> 
     <!-- begin of footer -->
 	<div class="wu-footer" data-options="region:'south',border:true,split:true">
-    	&copy; 2013 Wu All Rights Reserved
+    	&copy; XXX后台管理系统 by 云过梦无痕
     </div>
     <!-- end of footer -->  
     <script type="text/javascript">

@@ -9,14 +9,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         insert into authority(role_id,menu_id) values(#{roleId},#{menuId})
     </insert>
     
-    <!-- 查询权限 -->
+    <!-- 查询角色拥有的权限 -->
     <select id="findListByRoleId" resultType="com.ycz.pojo.Authority" parameterType="long">
-        select * from authority 
-       <where>
-          <if test="roleId!=null">
-             and role_id=#{roleId}
-          </if>
-       </where>
+        select * from authority where role_id=#{roleId}
     </select>
     
 </mapper>

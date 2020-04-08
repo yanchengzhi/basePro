@@ -13,11 +13,21 @@ public class User {
     private Long id;//ID，唯一主键
     private String username;//用户名
     private String password;//密码
+    private Long roleId;//角色ID
     private String photo;//头像地址
     private String sex;//性别，0代表女，1代表男
     private Integer age;//年龄
-    private String adderss;//住址
+    private String address;//住址  
     
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
+    }
+
     public Long getId() {
         return id;
     }
@@ -66,12 +76,12 @@ public class User {
         this.age = age;
     }
     
-    public String getAdderss() {
-        return adderss;
+    public String getAddress() {
+        return address;
     }
     
-    public void setAdderss(String adderss) {
-        this.adderss = adderss;
+    public void setAddress(String address) {
+        this.address = address;
     }
     
     

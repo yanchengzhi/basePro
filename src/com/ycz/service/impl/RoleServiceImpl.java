@@ -42,4 +42,9 @@ public class RoleServiceImpl implements RoleService {
         rDao.deleteRole(id);
     }
 
+    @Override
+    public List<Role> getAllRole() {
+        return rDao.getAllRole();
+    }
+
 }

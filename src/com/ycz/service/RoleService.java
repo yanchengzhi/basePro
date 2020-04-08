@@ -17,5 +17,7 @@ public interface RoleService {
     void edit(Role role);
 
     void deleteRole(Long id);
+    
+    List<Role> getAllRole();
 
 }

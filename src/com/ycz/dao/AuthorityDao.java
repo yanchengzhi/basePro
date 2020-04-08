@@ -10,7 +10,7 @@ public interface AuthorityDao {
 
     void add(Authority auth);
 
-    @Select("delete from authority where roleId=#{roleId}")
+    @Select("delete from authority where role_id=#{roleId}")
     void deleteByRoleId(Long roleId);
 
     List<Authority> findListByRoleId(Long roleId);

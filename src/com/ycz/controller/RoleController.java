@@ -94,6 +94,7 @@ public class RoleController {
             result2.setSuccess(true);
         } catch (Exception e) {
             e.printStackTrace();
+            result2.setData("无法删除！该角色下存在用户或权限信息");
             result2.setSuccess(false);
         }
         return result2;

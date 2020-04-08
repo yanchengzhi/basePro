@@ -21,4 +21,7 @@ public interface RoleDao {
     @Select("delete from role where id=#{id}")
     void deleteRole(Long id);
 
+    @Select("select * from role")
+    List<Role> getAllRole();
+
 }
