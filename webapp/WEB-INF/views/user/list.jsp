@@ -26,11 +26,6 @@
         });
     }
 </script>
-<style>
-  .selected{
-    background:orange;
-  }
-</style>
 </head>
 <body>
 
@@ -52,14 +47,14 @@
             <label>所属角色：</label>
             <select class="easyui-combobox" id="search-role" name="role" panelHeight="auto" style="width:120px">
                 <!-- 遍历父菜单 -->
-                <option>全部</option>
+                   <option value="-1">全部</option>
                 <c:forEach items="${roleList}" var="role">
                    <option value="${role.id}">${role.name}</option>
                 </c:forEach>
              </select>&nbsp;&nbsp;&nbsp;
              <label>性别：</label>
             <select class="easyui-combobox" id="search-sex" name="sex" panelHeight="auto" style="width:120px">
-                <option>全部</option>
+                <option value="-1">全部</option>
                 <option value="0">女</option>
                 <option value="1">男</option>
              </select>
@@ -69,10 +64,26 @@
     <!-- End of toolbar -->
     <table id="data-datagrid" class="easyui-datagrid" toolbar="#wu-toolbar"></table>
 </div>
+
+<!-- 这个文本框用作弹出 -->
+<input type="file" id="photo-file" style="display:none;" onchange="upload()">
 <!-- 添加弹窗 -->
 <div id="wu-dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:450px; padding:10px;">
 	<form id="add-form" method="post">
         <table>
+            <tr>
+                <td width="60" align="right">头像:</td>
+                <td>
+                   <input type="text" name="photo" id="add-photo" class="wu-text" style="width:250px;" value="${APP_PATH}/static/easyui/images/狗狗.jpg"/>
+                   <a href="#" class="easyui-linkbutton" iconCls="icon-upload" onclick="uploadPhoto()" plain="true">上传图片</a>
+                </td>
+            </tr> 
+            <tr>
+                <td width="60" align="right">头像预览:</td>
+                <td>
+                   <img alt="预览" id="preview-photo" src="${APP_PATH}/static/easyui/images/狗狗.jpg" style="width:70px;height:50px;">
+                </td>
+            </tr> 
             <tr>
                 <td width="60" align="right">用户名:</td>
                 <td><input type="text" name="username" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写用户名！' "/></td>
@@ -119,24 +130,112 @@
 	    <input type="hidden" name="id" id="edit-id"/>
         <table>
             <tr>
-                <td width="60" align="right">角色名称:</td>
-                <td><input type="text" name="name" id="edit-name" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写角色名称！' "/></td>
+                <td width="60" align="right">头像:</td>
+                <td>
+                   <input type="text" name="photo" id="edit-photo" class="wu-text" style="width:250px;" value="${APP_PATH}/static/easyui/images/狗狗.jpg"/>
+                   <a href="#" class="easyui-linkbutton" iconCls="icon-upload" onclick="uploadPhoto()" plain="true">上传图片</a>
+                </td>
+            </tr> 
+            <tr>
+                <td width="60" align="right">头像预览:</td>
+                <td>
+                   <img alt="预览" id="edit-preview-photo" src="${APP_PATH}/static/easyui/images/狗狗.jpg" style="width:70px;height:50px;">
+                </td>
+            </tr> 
+            <tr>
+                <td width="60" align="right">用户名:</td>
+                <td><input type="text" name="username" id="edit-username" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写用户名！' "/></td>
             </tr>           
             <tr>
-                <td valign="top" align="right">角色备注:</td>
-                <td><textarea name="remark" id="edit-remark" rows="6" class="wu-textarea" style="width:260px"></textarea></td>
+               <td align="right">用户角色:</td>
+               <td>
+                   <select class="easyui-combobox" id="edit-roleId" name="roleId" panelHeight="auto" style="width:268px"> 
+                     <c:forEach items="${roleList}" var="role">
+                     <option value="${role.id}">${role.name}</option>
+                     </c:forEach>
+                   </select>
+               </td>
             </tr>
+            <tr>
+               <td align="right">性别:</td>
+               <td>
+                   <select class="easyui-combobox" id="edit-sex" name="sex" panelHeight="auto" style="width:268px" data-options="required:true,missingMessage:'请选择年龄！' "> 
+                     <option value="1">男</option>
+                     <option value="0">女</option>                   
+                   </select>
+               </td>
+            </tr>
+            <tr>
+                <td width="60" align="right">年龄:</td>
+                <td><input type="text" name="age" id="edit-age" class="wu-text easyui-numberbox easyui-validatebox" data-options="required:true,min:1,precision:0,missingMessage:'请填写年龄！' "/></td>
+            </tr> 
+            <tr>
+                <td width="60" align="right">住址:</td>
+                <td><input type="text" name="address" id="edit-address" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写住址！' "/></td>
+            </tr> 
         </table>
     </form>
 </div>
 
-<!-- 选择权限弹窗 -->
-<div id="select-authority-dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:220px;height:300px;padding:10px;">
-   <!-- easyui的Tree容器 -->
-   <ul id="authority-tree" url="${APP_PATH}/auth/getAllMenu" checkbox="true"></ul>
+<div id="process-dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" title="正在上传" style="width:350px; padding:10px;">
+   <div id="p" class="easyui-progressbar" style="width:300px;" data-options="text:'上传中...' "></div>
 </div>
 <!-- End of easyui-dialog -->
 <script type="text/javascript">
+
+    function start(){
+    	var value = $('#p').progressbar('getValue');
+    	if(value<100){
+    		value+=Math.floor(Math.random()*10);
+    		 $('#p').progressbar('setValue',value);
+    	}else{
+    		$('#p').progressbar('setValue',0);
+    	}
+    };
+    
+    //点击上传图片时打开文件选择窗口
+    function uploadPhoto(){
+    	$('#photo-file').click();
+    }
+    
+    //图片上传
+    function upload(){
+    	if($('#photo-file').val=="")
+    		return;
+    	var formData = new FormData();
+    	formData.append('photo',document.getElementById('photo-file').files[0]);
+    	//打开进度条窗口
+    	$('#process-dialog').dialog('open');
+    	var interval = setInterval(start,100);
+    	$.ajax({
+    		url:'${APP_PATH}/user/uploadPhoto',
+    	    type:"POST",
+    	    data:formData,
+    	    contentType:false,
+    	    processData:false,
+    	    success:function(result){
+    	    	if(result.success){
+    	    		//清除进度条
+    	    		clearInterval(interval);
+    	    		//关闭进度条窗口
+    	    		$('#process-dialog').dialog('close');
+    	    		//将图片的路径重新赋给预览窗口
+    	    		$('#preview-photo').attr('src',result.data);
+    	    		//将图片路径填充进文本框
+    	    		$('#add-photo').val(result.data);
+    	    		$('#edit-preview-photo').attr('src',result.data);
+    	    		$('#edit-photo').val(result.data);
+    	    	}else{
+    	    		$.messager.alert('提示信息',result.data,'warning');
+    	    		//清除进度条
+    	    		clearInterval(interval);
+    	    		//关闭进度条窗口
+    	    		$('#process-dialog').dialog('close');
+    	    	}
+    	    }
+    	});
+    }
+
 	/**
 	* 添加记录
 	*/
@@ -165,61 +264,6 @@
 		});
 	}
 	
-	//选择icon图标弹窗
-	function selectIcon(){
-		if($('#icons-table').children().length==0){
-		$.ajax({
-			url:"${APP_PATH}/menu/getIcons",
-			type:"POST",
-			success:function(result){
-				if(result.success){
-				   var icons = result.data;
-				   var table = "";
-				   for(var i=0;i<icons.length;i++){
-					   var tbody = '<td class="icon-td"><a onclick="selected(this)" href="javascript:void(0)" class="'+icons[i]+'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a></td>'
-				       if(i==0){
-				    	   table+='<tr style="line-height:20px;">'+tbody;
-				    	   continue;
-				       }
-					   if((i+1)%24==0){//24个图标一行
-						   table+=tbody+'</tr><tr style="line-height:20px;">';
-						   continue;
-					   }
-					   table+=tbody;
-				   }
-				   table+='</tr>';
-				   $('#icons-table').append(table);
-				}else{
-					
-				}
-			}
-		});
-		}
-		$('#select-authority-dialog').dialog({
-			closed: false,
-			modal:true,
-            title: "选择权限信息",
-            buttons: [{
-                text: '确定',
-                iconCls: 'icon-ok',
-                //点击确定时
-                handler: function(){
-                	var icon = $('.selected a').attr('class');//获取选中图标的class值
-                	$('#add-icon').val(icon);//将值填充到文本框中
-                	$('#edit-icon').val(icon);//将值填充到文本框中
-                	$('#select-authority-dialog').dialog('close');//关闭弹窗
-                }
-            }, {
-                text: '取消',
-                iconCls: 'icon-cancel',
-                handler: function () {
-                    $('#select-authority-dialog').dialog('close');                    
-                }
-            }]
-        });
-	}
-	
-	
 	/**
 	* 修改记录
 	*/
@@ -231,7 +275,7 @@
 		//序列化表单
 		var data = $('#edit-form').serialize();
 		$.ajax({
-			url:"${APP_PATH}/role/edit",
+			url:"${APP_PATH}/user/editUser",
 			type:"POST",
 			data:data,
 			success:function(result){
@@ -242,7 +286,7 @@
 					//修改成功后重载数据
 					$('#data-datagrid').datagrid('reload');
 				}else{
-					$.messager.alert('提示信息','修改失败！','info');
+					$.messager.alert('提示信息',result.data,'info');
 				}
 			}
 		});
@@ -252,17 +296,22 @@
 	* 删除记录
 	*/
 	function remove(){
-		var item = $('#data-datagrid').datagrid('getSelected');
+		var item = $('#data-datagrid').datagrid('getSelections');
 		if(item==null||item.length==0){
 			$.messager.alert('信息提示','请选择需要删除的数据！','info');
+			return;
 			}
-		$.messager.confirm('信息提示','确定要删除【'+item.name+'】记录？', function(result){
+		$.messager.confirm('信息提示','确定要删除这'+item.length+'条记录？', function(result){
 			if(result){
+				var ids = '';
+				for(var i=0;i<item.length;i++){
+				     ids+=item[i].id+',';	
+				}
 				$.ajax({
-					url:"${APP_PATH}/role/delete",
+					url:"${APP_PATH}/user/deleteUsers",
 					type:"POST",
 					data:{
-						"id":Number(item.id)
+						"ids":ids
 					},
 					success:function(result2){
 						if(result2.success){
@@ -270,7 +319,7 @@
 							//修改成功后重载数据
 							$('#data-datagrid').datagrid('reload');
 						}else{
-							$.messager.alert('提示信息',result2.data,'error');
+							$.messager.alert('提示信息','删除失败！','error');
 						}
 					}
 				});
@@ -286,7 +335,7 @@
 		$('#wu-dialog').dialog({
 			closed: false,
 			modal:true,
-            title: "添加角色信息",
+            title: "添加用户信息",
             buttons: [{
                 text: '确定',
                 iconCls: 'icon-ok',
@@ -297,7 +346,13 @@
                 handler: function () {
                     $('#wu-dialog').dialog('close');                    
                 }
-            }]
+            }],
+            //添加用户时，清空文本框中的数据，需要时使用，因为用户添加时有重复的信息，避免再次输入，可以不清空
+            /*
+            onBeforeOpen:function(){
+            	$('#add-form input').val("");
+            }
+		*/
         });
 	}
 	
@@ -305,16 +360,23 @@
 	* 打开修改窗口
 	*/
 	function openEdit(){
-		//获取选中的记录
-		var item = $('#data-datagrid').datagrid('getSelected');
+		//获取选中的多条记录
+		var item = $('#data-datagrid').datagrid('getSelections');
 		if(item==null||item.length==0){
-			$.messager.alert('信息提示','请选择需要修改的数据','info');
+			$.messager.alert('信息提示','请选择需要修改的数据！','info');
+			return;
 			}
+		if(item.length>1){
+			$.messager.alert('信息提示','请选择单条数据！','info');
+			return;
+		}
+		//选择单条数据时，获取数组中的数据
+		item = item[0];
 		
 		$('#edit-dialog').dialog({
 			closed: false,
 			modal:true,
-            title: "修改角色信息",
+            title: "修改用户信息",
             buttons: [{
                 text: '确定',
                 iconCls: 'icon-ok',
@@ -329,166 +391,32 @@
             //修改的记录数据回显
             onBeforeOpen:function(){
             	$('#edit-id').val(item.id);
-            	$('#edit-name').val(item.name);
-            	$('#edit-remark').val(item.remark);
+            	$('#edit-preview-photo').attr('src',item.photo);
+            	$('#edit-photo').val(item.photo);
+            	$('#edit-username').val(item.username);
+            	$('#edit-roleId').combobox('setValue',item.roleId);
+            	$('#edit-sex').combobox('setValue',item.sex);
+            	$('#edit-age').val(item.age);
+            	$('#edit-address').val(item.address);
             }
         });
 	}	
 	
-	//角色已有权限
-	var existAuth = null;
-	function isAdded(row,rows){
-		for(var k=0;k<existAuth.length;k++){
-			if(existAuth[k].menuId==row.id && haveParent(rows,row.parentId)){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	//判断是否有顶级父类
-	function exists(rows, parentId){
-		for(var i=0; i<rows.length; i++){
-			if (rows[i].id == parentId) return true;
-		}
-		return false;
-	}
-	
-	//判断父分类是否还有父类
-	function haveParent(rows,parentId){
-		for(var i=0;i<rows.length;i++){
-			if(rows[i].id==parentId){
-				if(rows[i].parentId!=0)return true;
-			}
-		}
-		return false;
-	}
-	
-	function convert(rows){	
-		var nodes = [];
-		//获取所有的父类，放到nodes中
-		for(var i=0; i<rows.length; i++){
-			var row = rows[i];
-			if (!exists(rows, row.parentId)){
-				nodes.push({
-					id:row.id,
-					text:row.name
-				});
-			}
-		}
-		
-		//将nodes中的内容复制到toDo中
-		var toDo = [];
-		for(var i=0; i<nodes.length; i++){
-			toDo.push(nodes[i]);
-		}
-		while(toDo.length){
-			var node = toDo.shift();	// the parent node
-			// get the children nodes
-			for(var i=0; i<rows.length; i++){
-				var row = rows[i];
-				if (row.parentId == node.id){
-					var child = {id:row.id,text:row.name};
-					//添加选中属性
-					if(isAdded(row,rows)){
-						child.checked = true;
-					}
-					if (node.children){
-						node.children.push(child);
-					} else {
-						node.children = [child];
-					}
-					//把刚创建的子节点加到父类中
-					toDo.push(child);
-				}
-			}
-		}
-		return nodes;
-	}
-	
-	//打开权限选择框
-	function selectAuth(roleId){
-		$('#select-authority-dialog').dialog({
-			closed: false,
-			modal:true,
-            title: "选择权限信息",
-            buttons: [{
-                text: '确定',
-                iconCls: 'icon-ok',
-                //点击确定时
-                handler: function(){
-                	//获取所有选中的子节点
-                	var checkedNodes = $('#authority-tree').tree('getChecked');
-                	var ids = '';
-                	for(var i=0;i<checkedNodes.length;i++){
-                		ids+=checkedNodes[i].id + ',';
-                	}
-                	//获取子节点的父节点（不会重复）
-                	var checkedParentNodes = $('#authority-tree').tree('getChecked', 'indeterminate');
-                	for(var i=0;i<checkedParentNodes.length;i++){
-                		ids+=checkedParentNodes[i].id + ',';
-                	}
-                	
-                	//执行添加            
-                	if(ids!=""){//先进行非空判断
-                	$.ajax({
-                		url:"${APP_PATH}/auth/add",
-                		type:"POST",
-                		data:{
-                			"ids":ids,
-                			"roleId":roleId
-                		},
-                		success:function(result){
-                			if(result.success){
-                				$.messager.alert('信息提示','权限编辑成功！','info');
-                				//关闭弹窗
-                				$('#select-authority-dialog').dialog('close');
-                			}else{
-                				$.messager.alert('信息提示','权限编辑失败！','info');
-                			}
-                		}
-                	});
-                   }else{
-                	   $.messager.alert('信息提示','请选择需要添加的权限！','info'); 
-                   }
-                }
-            }, {
-                text: '取消',
-                iconCls: 'icon-cancel',
-                handler: function () {
-                    $('#select-authority-dialog').dialog('close');                    
-                }
-            }],
-            //打开窗口之前的操作
-            onBeforeOpen:function(){
-            	//查出该角色已有权限
-            	$.ajax({
-            		url:"${APP_PATH}/auth/getRoleAuthority",
-            		type:"POST",
-            		data:{
-            			"roleId":roleId
-            		},
-            		success:function(data){
-            			existAuth = data;
-                        //加载树
-                        $('#authority-tree').tree({
-                        	loadFilter:function(rows){
-                        		return convert(rows);
-                        	}
-                        });
-            		}
-            	});
-            	//
-            }
-        });
-		
-	}
-	
 	//实现模糊查询
 		$('#search-btn').click(function(){
-		$('#data-datagrid').datagrid('reload',{
-			name:$('#search-name').val()
-		});
+			var roleId = $('#search-role').combobox('getValue');
+			var sex = $('#search-sex').combobox('getValue');
+			//这里使用json的格式来传值
+			var option = {
+					username:$('#search-name').val()
+			};
+			if(roleId!=-1){
+				option.roleId = roleId;
+			}
+			if(sex!=-1){
+				option.sex = sex;
+			}
+			$('#data-datagrid').datagrid('reload',option);
 	});
 	
 	
@@ -498,7 +426,7 @@
 	$('#data-datagrid').datagrid({
 		url:'${APP_PATH}/user/listData',
 		rownumbers:true,//是否显示行号
-		singleSelect:true,//是否只支持单选
+		singleSelect:false,//是否只支持单选,true支持单选，false支持多选
 		pageSize:20,//每页显示的记录条数           
 		pagination:true,//是否开启分页功能
 		multiSort:true,
@@ -506,12 +434,31 @@
 		fit:true,
 		columns:[[
 			{ field:'chk',checkbox:true},
-			{ field:'username',title:'用户名',width:100,sortable:true},
-			{ field:'roleId',title:'所属角色',width:180,sortable:true},
-			{ field:'photo',title:'头像地址',width:180,sortable:true},
-			{ field:'sex',title:'性别',width:180,sortable:true},
-			{ field:'age',title:'年龄',width:180,sortable:true},
-			{ field:'address',title:'住址',width:180,sortable:true},
+			//加载数据的时候显示头像
+			{ field:'photo',title:'用户头像',width:70,align:'center',formatter:function(value,row,index){
+				var img = '<img src="'+value+'" width="80px"/>';
+				return img;
+			}},
+			{ field:'username',title:'用户名',align:'center',width:100,sortable:true},
+			{ field:'password',title:'密码',align:'center',width:100},
+			{ field:'roleId',title:'所属角色',align:'center',width:100,formatter:function(value,row,index){
+				//获取所有角色
+				var roleList = $('#search-role').combobox('getData');
+				for(var i=0;i<roleList.length;i++){
+					if(value==roleList[i].value){
+						return roleList[i].text;
+					}
+				}
+			}},
+			{ field:'sex',title:'性别',align:'center',width:100,formatter:function(value,row,index){
+				if(value==0){
+					return "女";
+				}else{
+					return "男";
+				}
+			}},
+			{ field:'age',title:'年龄',align:'center',width:100},
+			{ field:'address',title:'住址',align:'center',width:200},
 		]],
 		//将文字内容加入到按钮中，连接为一个整体
 		onLoadSuccess:function(data){

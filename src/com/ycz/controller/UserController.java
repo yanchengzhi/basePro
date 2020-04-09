@@ -1,14 +1,20 @@
 package com.ycz.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ycz.pojo.AjaxResult;
@@ -109,6 +115,106 @@ public class UserController {
         }
         return result;
     }
+    
+    /**
+     * 
+     * @Description (修改用户)
+     * @param user
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("editUser")
+    public AjaxResult editUser(User user) {
+        AjaxResult result = new AjaxResult();
+        try {
+                uService.editUser(user);
+                result.setSuccess(true);          
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setData("用户添加失败！");
+            result.setSuccess(false);
+        }
+        return result;
+    }
+    
+    /**
+     * 
+     * @Description (批量删除用户)
+     * @param ids
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("deleteUsers")
+    public AjaxResult deleteUsers(String ids) {
+        AjaxResult result2 = new AjaxResult();
+        try {
+            ids=ids.substring(0,ids.length()-1);//先去掉尾部逗号
+            //然后执行删除操作
+            uService.deleteUser(ids);
+            result2.setSuccess(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result2.setSuccess(false);
+        }
+        return result2;
+    }
+    
+    /**
+     * 
+     * @Description (图片上传)
+     * @param photo
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("uploadPhoto")
+    public AjaxResult uploadPhoto(MultipartFile photo,HttpServletRequest request) {
+        AjaxResult result = new AjaxResult();
+        //先判断图片是否为空
+        if(photo==null) {
+            result.setData("请选择要上传的图片！");
+            result.setSuccess(false);
+        }else {//再判断图片大小是否超过10M
+            if(photo.getSize()>1024*1024*10) {
+                result.setData("图片大小超过10M！");
+                result.setSuccess(false);
+            }else {
+                //获取文件后缀名（格式）
+                String suffix = photo.getOriginalFilename().substring(
+                        photo.getOriginalFilename().lastIndexOf(".")+1);
+                //判断是否为图片
+                if(!"jpg,jpeg,gif,png".toUpperCase().contains(suffix.toUpperCase())) {
+                    result.setData("请选择jpg,jpeg,gif,png的图片格式文件！");
+                    result.setSuccess(false);
+                }else {
+                    //获取图片保存路径
+                    String path = request.getServletContext().getRealPath("/") + "/static/upload/images/";
+                    File file = new File(path);
+                    //判断目录是否存在
+                    if(!file.exists()) {
+                        file.mkdirs();
+                    }
+                    //使用时间戳命名文件，避免重复
+                    String fileName = new Date().getTime()+"."+suffix;
+                    try {
+                        //保存文件
+                        photo.transferTo(new File(path+fileName));
+                        //获取文件绝对路径
+                        String name = request.getServletContext().getContextPath() + "/static/upload/images/" + fileName;
+                        result.setData(name);
+                        result.setSuccess(true);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        result.setData("文件保存失败！");
+                        result.setSuccess(false);
+                    } 
+                }
+            }
+            
+        }          
+        return result;
+    }
+    
     
     
 

@@ -465,10 +465,10 @@
 		fit:true,
 		columns:[[
 			{ field:'chk',checkbox:true},
-			{ field:'name',title:'角色名称',width:100,sortable:true},
-			{ field:'remark',title:'角色备注',width:180,sortable:true},
+			{ field:'name',title:'角色名称',align:'center',width:100,sortable:true},
+			{ field:'remark',title:'角色备注',align:'center',width:180,sortable:true},
 			//icon图标添加一个预览功能
-			{ field:'icon',title:'角色权限',width:100,formatter:function(value,row,index){
+			{ field:'icon',title:'角色权限',align:'center',width:100,formatter:function(value,row,index){
 				var test = '<a class="authority-edit" onclick="selectAuth('+row.id+')"></a>';
 				return test;
 			}}

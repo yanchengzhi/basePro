@@ -13,7 +13,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
    
    <!-- 批量删除用户 -->
    <delete id="deleteUser" parameterType="String">
-      delete from user where id in(${ids})
+     <!-- ${value}是获取传过来的变量的值 -->
+      delete from user where id in(${value})
    </delete>
    
    <!-- 修改用户 -->
