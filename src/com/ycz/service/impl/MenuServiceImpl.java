@@ -51,4 +51,19 @@ public class MenuServiceImpl implements MenuService {
         return mDao.findChildren(id);
     }
 
+    @Override
+    public List<Menu> findMenuList(String ids) {
+        return mDao.findMenuList(ids);
+    }
+
+    @Override
+    public List<Menu> queryAll() {
+        return mDao.queryAll();
+    }
+
+    @Override
+    public Menu findMenu(Long id) {
+        return mDao.findMenu(id);
+    }
+
 }

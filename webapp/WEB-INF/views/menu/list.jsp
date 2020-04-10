@@ -1,6 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"  isErrorPage="true"
     pageEncoding="UTF-8"%>
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="${APP_PATH}/static/easyui/easyui/1.3.4/themes/default/easyui.css" />
+<link rel="stylesheet" type="text/css" href="${APP_PATH}/static/easyui/css/wu.css" />
+<link rel="stylesheet" type="text/css" href="${APP_PATH}/static/easyui/css/icon.css" />
+<script type="text/javascript" src="${APP_PATH}/static/easyui/js/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="${APP_PATH}/static/easyui/easyui/1.3.4/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="${APP_PATH}/static/easyui/easyui/1.3.4/locale/easyui-lang-zh_CN.js"></script>    
 <style>
   .selected{
     background:orange;
@@ -19,6 +29,8 @@
         });
     }
 </script>
+</head>
+<body>
 <div id="loading" style="position:absolute;z-index:1000;top:0;left:0;width:100%;height:100%;background:#F9F9F9;text-align :center;padding-top:10%;">
    <img alt="" src="${APP_PATH}/static/h-ui/images/loadinginner.gif" style="width:40%">
    <h1><font color="#15428B">加载中....</font></h1>
@@ -27,10 +39,9 @@
     <!-- Begin of toolbar -->
     <div id="wu-toolbar">
         <div class="wu-toolbar-button">
-            <a href="#" class="easyui-linkbutton" iconCls="icon-add" onclick="openAdd()" plain="true">添加</a>
-            <a href="#" class="easyui-linkbutton" iconCls="icon-edit" onclick="openEdit()" plain="true">修改</a>
-            <a href="#" class="easyui-linkbutton" iconCls="icon-remove" onclick="remove()" plain="true">删除</a>
-            <a href="#" class="easyui-linkbutton" iconCls="icon-add1" onclick="openAddMenu()" plain="true">添加按钮</a>        
+            <c:forEach items="${thirdMenus}" var="tMenu">
+               <a href="#" class="easyui-linkbutton" iconCls="${tMenu.icon}" onclick="${tMenu.url}" plain="true">${tMenu.name}</a>
+            </c:forEach>
         </div>
         <div class="wu-toolbar-search">
             <label>菜单名称：</label><input class="wu-text" id="search-name" style="width:100px">
@@ -392,7 +403,7 @@
 		//获取选中的记录
 		var item = $('#data-datagrid').treegrid('getSelected');
 		if(item==null||item.length==0){
-			$.messager.alert('信息提示','请选择需要修改的数据','info');
+			$.messager.alert('信息提示','请选择需要修改的数据！','info');
 			}
 		
 		$('#edit-dialog').dialog({
@@ -447,7 +458,7 @@
 		url:'${APP_PATH}/menu/listData',
 		rownumbers:true,//是否显示行号
 		singleSelect:true,//是否只支持单选
-		pageSize:20,//每页显示的记录条数           
+		pageSize:30,//每页显示的记录条数           
 		pagination:true,//是否开启分页功能
 		multiSort:true,
 		fitColumns:true,//是否填充列
@@ -465,3 +476,5 @@
 		]]
 	});
 </script>
+</body>
+</html>

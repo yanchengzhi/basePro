@@ -21,4 +21,8 @@ public interface UserService {
     
     int getTotal(Map<String,Object> map);
 
+    List<User> selectUser(String ids);
+
+    void resetPass(User currentUser);
+
 }

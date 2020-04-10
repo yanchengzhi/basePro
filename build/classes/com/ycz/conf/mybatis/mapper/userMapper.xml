@@ -23,6 +23,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
       sex=#{sex},age=#{age},address=#{address} where id=#{id}
    </update>
    
+   <!-- 查询删除的用户 -->
+   <select id="selectUser" resultType="com.ycz.pojo.User" parameterType="String">
+      select * from user where id in (${value})
+   </select>
+   
    <!-- 分页查询 -->
    <select id="findList" resultType="com.ycz.pojo.User" parameterType="map">
       select * from user

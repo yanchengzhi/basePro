@@ -24,4 +24,7 @@ public interface RoleDao {
     @Select("select * from role")
     List<Role> getAllRole();
 
+    @Select("select * from role where id=#{roleId}")
+    Role findRoleByRoleId(Long roleId);
+
 }

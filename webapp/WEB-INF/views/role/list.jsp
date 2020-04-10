@@ -43,9 +43,9 @@
     <!-- Begin of toolbar -->
     <div id="wu-toolbar">
         <div class="wu-toolbar-button">
-            <a href="#" class="easyui-linkbutton" iconCls="icon-add" onclick="openAdd()" plain="true">添加</a>
-            <a href="#" class="easyui-linkbutton" iconCls="icon-edit" onclick="openEdit()" plain="true">修改</a>
-            <a href="#" class="easyui-linkbutton" iconCls="icon-remove" onclick="remove()" plain="true">删除</a>
+            <c:forEach items="${thirdMenus}" var="tMenu">
+               <a href="#" class="easyui-linkbutton" iconCls="${tMenu.icon}" onclick="${tMenu.url}" plain="true">${tMenu.name}</a>
+            </c:forEach>
         </div>
         <div class="wu-toolbar-search">
             <label>角色名称：</label><input class="wu-text" id="search-name" style="width:100px">
@@ -267,7 +267,7 @@
 		//获取选中的记录
 		var item = $('#data-datagrid').datagrid('getSelected');
 		if(item==null||item.length==0){
-			$.messager.alert('信息提示','请选择需要修改的数据','info');
+			$.messager.alert('信息提示','请选择需要修改的数据！','info');
 			}
 		
 		$('#edit-dialog').dialog({

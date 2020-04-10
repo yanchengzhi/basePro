@@ -47,4 +47,9 @@ public class RoleServiceImpl implements RoleService {
         return rDao.getAllRole();
     }
 
+    @Override
+    public Role findRoleByRoleId(Long roleId) {
+        return rDao.findRoleByRoleId(roleId);
+    }
+
 }

@@ -2,10 +2,14 @@ package com.ycz.controller;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,9 +20,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ycz.pojo.AjaxResult;
+import com.ycz.pojo.Authority;
+import com.ycz.pojo.Menu;
+import com.ycz.pojo.Role;
 import com.ycz.pojo.User;
+import com.ycz.service.AuthorityService;
+import com.ycz.service.LogService;
+import com.ycz.service.MenuService;
+import com.ycz.service.RoleService;
 import com.ycz.service.UserService;
 import com.ycz.util.CpachaUtil;
+import com.ycz.util.MenuUtil;
 
 /**
  * @ClassName SystemController
@@ -34,13 +46,46 @@ public class SystemController {
     
     @Autowired
     private UserService uService;
+    
+    @Autowired
+    private RoleService rService;
+    
+    @Autowired
+    private AuthorityService aService;
+    
+    @Autowired
+    private MenuService mService;
+    
+    @Autowired
+    private LogService lService;
 
     @RequestMapping(value = "index", method = RequestMethod.GET)
-    public ModelAndView index() {
+    public ModelAndView index(HttpServletRequest request) {
+        //取出作用域中的用户菜单
+        List<Menu> mList = (List<Menu>) request.getSession().getAttribute("mList");
         ModelAndView mav = new ModelAndView("system/index");
-        mav.addObject("name", "鄢承志");
+        //获取顶级菜单
+        List<Menu> topList = MenuUtil.getAllTopMenus(mList);
+        //获取二级菜单
+        List<Menu> secList = MenuUtil.getAllSecondMenus(mList);
+        mav.addObject("topMenus",topList);
+        mav.addObject("secondMenus",secList);
         return mav;
     }
+    
+    /**
+     * 
+     * @Description (用户退出)
+     * @param request
+     * @return
+     */
+    @RequestMapping("logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession();//获取作用域
+        session.invalidate();//作用域失效
+        return "redirect:login";
+    }
+    
 
     /**
      * 
@@ -110,6 +155,30 @@ public class SystemController {
                     if(cpacha.equalsIgnoreCase(loginCpacha.toString())) {
                         //验证码通过后允许用户登录
                         request.getSession().setAttribute("currentUser", dbUser);//存到会话域中
+                        //查询该用户拥有的角色
+                        Role role = rService.findRoleByRoleId(dbUser.getRoleId());
+                        //查询该角色拥有的权限
+                        List<Authority> authList = aService.findListByRoleId(role.getId());
+                        //获取权限对应的菜单ID
+                        StringBuilder sb = new StringBuilder("");
+                        for(Authority auth:authList) {
+                            sb.append(auth.getMenuId()).append(",");
+                        }
+                        //去掉最后一个逗号
+                        String ids = sb.toString().substring(0,sb.toString().length()-1);
+                        List <Menu> mList = mService.findMenuList(ids);
+                        Set<String> uriSet = new HashSet<>();
+                        for(Menu m:mList) {
+                            if(m.getUrl()!=null && !"".equals(m.getUrl())) {              
+                                uriSet.add(request.getSession().getServletContext().getContextPath()+"/"+m.getUrl());
+                            }
+                        }                      
+                        //将角色和菜单信息存到会话域中和用户绑定
+                        request.getSession().setAttribute("role", role);
+                        request.getSession().setAttribute("mList", mList);
+                        //将用户的合法url存到session域中
+                        request.getSession().setAttribute("uriSet", uriSet);
+                        lService.addLog(role.getName(), dbUser.getUsername(), "登陆系统成功！");
                         result.setSuccess(true);
                     }else {
                         result.setData("验证码错误！");
@@ -126,6 +195,37 @@ public class SystemController {
                 }
                 result.setSuccess(false);
             }
+        return result;
+    }
+    
+    /**
+     * 
+     * @Description (跳往密码修改页面)
+     * @param mav
+     * @return
+     */
+    @RequestMapping("resetPassword")
+    public ModelAndView resetPassword(ModelAndView mav) {
+        mav.setViewName("system/edit_password");
+        return mav;
+    }
+    
+    @ResponseBody
+    @RequestMapping("resetPasswordDo")
+    public AjaxResult resetPasswordDo(String password,HttpServletRequest request) {
+        AjaxResult result = new AjaxResult();
+        try {
+            //获取当前用户
+            User currentUser = (User) request.getSession().getAttribute("currentUser");
+            Role role = rService.findRoleByRoleId(currentUser.getRoleId());
+            currentUser.setPassword(password);
+            uService.resetPass(currentUser);
+            result.setSuccess(true);
+            lService.addLog(role.getName(), currentUser.getUsername(), "修改了密码！");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setSuccess(false);
+        }
         return result;
     }
 

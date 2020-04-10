@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +18,11 @@ import com.ycz.pojo.AjaxResult;
 import com.ycz.pojo.Menu;
 import com.ycz.pojo.Page;
 import com.ycz.pojo.Role;
+import com.ycz.pojo.User;
+import com.ycz.service.LogService;
+import com.ycz.service.MenuService;
 import com.ycz.service.RoleService;
+import com.ycz.util.MenuUtil;
 
 /**
  * 
@@ -33,6 +40,12 @@ public class RoleController {
     @Autowired
     private RoleService rService;
     
+    @Autowired
+    private MenuService mService;
+    
+    @Autowired
+    private LogService lService;
+    
     /**
      * 
      * @Description (跳往角色列表页面)
@@ -40,7 +53,13 @@ public class RoleController {
      * @return
      */
     @RequestMapping("list")
-    public ModelAndView list(ModelAndView mav) {
+    public ModelAndView list(ModelAndView mav,HttpServletRequest request) {
+        String mid = request.getParameter("mid");
+        //获取角色对应的所有菜单
+        List<Menu> RoleMenus = (List<Menu>) request.getSession().getAttribute("mList");
+        //获取三级菜单
+        List<Menu> thirdMenus = MenuUtil.getAllThirdMenus(RoleMenus, Long.parseLong(mid));
+        mav.addObject("thirdMenus", thirdMenus);
         mav.setViewName("/role/list");
         return mav;
     }
@@ -53,11 +72,14 @@ public class RoleController {
      */
     @ResponseBody
     @RequestMapping("add")
-    public AjaxResult add(Role role) {
+    public AjaxResult add(Role role,HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");//获取当前用户
+        Role role2 = rService.findRoleByRoleId(currentUser.getRoleId());//获取当前用户的角色
         AjaxResult result = new AjaxResult();
         try {
             rService.add(role);
             result.setSuccess(true);
+            lService.addLog(role2.getName(), currentUser.getUsername(), "为系统添加了新角色【"+role.getName()+"】！");
         } catch (Exception e) {
             e.printStackTrace();
             result.setSuccess(false);
@@ -73,11 +95,14 @@ public class RoleController {
      */
     @ResponseBody
     @RequestMapping("edit")
-    public AjaxResult edit(Role role) {
+    public AjaxResult edit(Role role,HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");//获取当前用户
+        Role role2 = rService.findRoleByRoleId(currentUser.getRoleId());//获取当前用户的角色
         AjaxResult result = new AjaxResult();
         try {
             rService.edit(role);
             result.setSuccess(true);
+            lService.addLog(role2.getName(), currentUser.getUsername(), "修改了系统角色【"+role.getName()+"】！");
         } catch (Exception e) {
             e.printStackTrace();
             result.setSuccess(false);
@@ -87,11 +112,16 @@ public class RoleController {
     
     @ResponseBody
     @RequestMapping("delete")
-    public AjaxResult delete(Long id) {
+    public AjaxResult delete(Long id,HttpSession session) {
+        User currentUser = (User) session.getAttribute("currentUser");//获取当前用户
+        Role role2 = rService.findRoleByRoleId(currentUser.getRoleId());//获取当前用户的角色
         AjaxResult result2 = new AjaxResult();
         try {
+            //获取到被删除的角色
+            Role role = rService.findRoleByRoleId(id);
             rService.deleteRole(id);
             result2.setSuccess(true);
+            lService.addLog(role2.getName(), currentUser.getUsername(), "删除了系统角色【"+role.getName()+"】！");
         } catch (Exception e) {
             e.printStackTrace();
             result2.setData("无法删除！该角色下存在用户或权限信息");

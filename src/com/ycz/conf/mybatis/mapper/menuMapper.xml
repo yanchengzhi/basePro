@@ -47,6 +47,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
        </where>
     </select>
     
+    <select id="findMenuList" resultType="com.ycz.pojo.Menu" parameterType="String">
+       select * from menu where id in(${value})
+    </select>
+    
     <!-- 修改记录 -->
     <update id="edit" parameterType="com.ycz.pojo.Menu">
         update menu set parent_id=#{parentId},name=#{name},url=#{url},icon=#{icon}

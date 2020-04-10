@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ycz.dao.LogDao">
+     
+     <!-- 分页查询日志 -->
+     <select id="findLogList" resultType="com.ycz.pojo.Log" parameterType="map">
+        select * from log
+        <where>
+           <if test="content!=null">
+              and content like concat('%',#{content},'%')
+           </if>
+        </where>
+        limit #{offset},#{pageSize}
+     </select>
+     
+     <!-- 查询总记录条数 -->
+     <select id="getTotal" resultType="int" parameterType="map">
+        select count(*) from log
+        <where>
+           <if test="content!=null">
+              and content like concat('%',#{content},'%')
+           </if>
+        </where>
+     </select>
+     
+     <!-- 删除日志 -->
+     <delete id="deleteLog" parameterType="String">
+        delete from log where id in (${value})
+     </delete>
+</mapper>

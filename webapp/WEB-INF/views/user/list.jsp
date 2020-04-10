@@ -38,9 +38,9 @@
     <!-- Begin of toolbar -->
     <div id="wu-toolbar">
         <div class="wu-toolbar-button">
-            <a href="#" class="easyui-linkbutton" iconCls="icon-add" onclick="openAdd()" plain="true">添加</a>
-            <a href="#" class="easyui-linkbutton" iconCls="icon-edit" onclick="openEdit()" plain="true">修改</a>
-            <a href="#" class="easyui-linkbutton" iconCls="icon-remove" onclick="remove()" plain="true">删除</a>
+            <c:forEach items="${thirdMenus}" var="tMenu">
+               <a href="#" class="easyui-linkbutton" iconCls="${tMenu.icon}" onclick="${tMenu.url}" plain="true">${tMenu.name}</a>
+            </c:forEach>
         </div>
         <div class="wu-toolbar-search">
             <label>用户名：</label><input class="wu-text" id="search-name" style="width:100px">&nbsp;&nbsp;&nbsp;
@@ -436,11 +436,10 @@
 			{ field:'chk',checkbox:true},
 			//加载数据的时候显示头像
 			{ field:'photo',title:'用户头像',width:70,align:'center',formatter:function(value,row,index){
-				var img = '<img src="'+value+'" width="80px"/>';
+				var img = '<img src="'+value+'" width="80px" height="50px"/>';
 				return img;
 			}},
 			{ field:'username',title:'用户名',align:'center',width:100,sortable:true},
-			{ field:'password',title:'密码',align:'center',width:100},
 			{ field:'roleId',title:'所属角色',align:'center',width:100,formatter:function(value,row,index){
 				//获取所有角色
 				var roleList = $('#search-role').combobox('getData');
@@ -462,6 +461,7 @@
 		]],
 		//将文字内容加入到按钮中，连接为一个整体
 		onLoadSuccess:function(data){
+			$('#data-datagrid').datagrid('fixRowHeight');//固定行高
 			$('.authority-edit').linkbutton({
 				text:'编辑权限',
 				plain:true,

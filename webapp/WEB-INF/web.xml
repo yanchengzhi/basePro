@@ -79,7 +79,7 @@ id="WebApp_ID" version="3.1">
 	
 	<!-- 设置session的生命周期，这里暂定为10分钟-->
 	<session-config>
-	   <session-timeout>1</session-timeout>
+	   <session-timeout>5</session-timeout>
 	</session-config>
 	
 </web-app>

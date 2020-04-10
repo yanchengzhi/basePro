@@ -51,4 +51,14 @@ public class UserServiceImpl implements UserService {
         return uDao.getTotal(map);
     }
 
+    @Override
+    public List<User> selectUser(String ids) {
+        return uDao.selectUser(ids);
+    }
+
+    @Override
+    public void resetPass(User currentUser) {
+        uDao.resetPass(currentUser);
+    }
+
 }

@@ -21,4 +21,12 @@ public interface MenuService {
 
     List<Menu> findChildren(Long id);
 
+    List<Menu> findMenuList(String ids);
+
+    List<Menu> queryAll();
+    
+    Menu findMenu(Long id);
+    
+   
+
 }

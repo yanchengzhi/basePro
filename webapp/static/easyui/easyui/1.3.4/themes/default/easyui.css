@@ -1131,6 +1131,7 @@ a:hover.l-btn-plain-selected {
 }
 .datagrid-header,
 .datagrid-td-rownumber {
+  height:40px;
   background-color: #efefef;
   background: -webkit-linear-gradient(top,#F9F9F9 0,#efefef 100%);
   background: -moz-linear-gradient(top,#F9F9F9 0,#efefef 100%);

@@ -25,4 +25,9 @@ public interface UserDao {
 
     int getTotal(Map<String, Object> map);
 
+    List<User> selectUser(String ids);
+
+    @Select("update user set password=#{password} where id=#{id}")
+    void resetPass(User currentUser);
+
 }
