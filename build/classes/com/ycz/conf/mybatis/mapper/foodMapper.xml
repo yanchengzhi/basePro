@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ycz.dao.FoodDao">
+   
+   <!-- 添加菜品 -->
+   <insert id="add" parameterType="com.ycz.pojo.Food">
+      insert into food(name,category_id,price,image_url,description) values(
+      #{name},#{categoryId},#{price},#{imageUrl},#{description}
+      )
+   </insert>
+   
+   <!-- 修改信息 -->
+   <update id="edit" parameterType="com.ycz.pojo.Food">
+     update food set name=#{name},category_id=#{categoryId},price=#{price},
+     image_url=#{imageUrl},description=#{description} where id=#{id}
+   </update>
+   
+   <!-- 获取总的记录条数 -->
+   <select id="getTotal" resultType="int" parameterType="map">
+     select count(*) from food
+     <where>
+        <if test="name!=null">
+           and name like concat('%',#{name},'%')
+        </if>
+        <if test="categoryId!=null">
+           and category_id=#{categoryId}
+        </if>
+     </where>
+   </select>
+   
+   <!-- 分页查询 -->
+   <select id="findList" resultType="com.ycz.pojo.Food" parameterType="map">
+      select * from food
+     <where>
+        <if test="name!=null">
+           and name like concat('%',#{name},'%')
+        </if>
+        <if test="categoryId!=null">
+           and category_id=#{categoryId}
+        </if>
+     </where>
+     limit #{offset},#{pageSize}
+   </select>
+    
+</mapper>

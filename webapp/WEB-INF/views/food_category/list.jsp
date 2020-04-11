@@ -43,7 +43,7 @@
             </c:forEach>
         </div>
         <div class="wu-toolbar-search">
-            <label>日志内容：</label><input class="wu-text" id="search-name" style="width:100px">&nbsp;&nbsp;&nbsp;
+            <label>菜品分类名称：</label><input class="wu-text" id="search-name" style="width:100px">&nbsp;&nbsp;&nbsp;
             <a href="#" class="easyui-linkbutton" id="search-btn" iconCls="icon-search">搜索</a>
         </div>
     </div>
@@ -56,8 +56,30 @@
 	<form id="add-form" method="post">
         <table>           
             <tr>
-                <td valign="top" align="right">日志内容:</td>
-                <td><textarea name="content" id="content" rows="6" class="wu-textarea easyui-validatebox" style="width:260px" data-options="required:true,missingMessage:'请填写日志内容！' "></textarea></td>
+                <td valign="top" align="right">菜品分类名称:</td>
+                <td><input type="text" name="name" id="name" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写菜品分类名称！' "/></td>
+            </tr>
+            <tr>
+                <td valign="top" align="right">备注信息:</td>
+                <td><textarea name="remark" id="remark" rows="6" class="wu-textarea" style="width:260px"></textarea></td>
+            </tr> 
+        </table>
+    </form>
+</div>
+
+<!-- 修改弹窗 -->
+<div id="edit-dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:450px; padding:10px;">
+	<form id="edit-form" method="post">
+	    <input type="hidden" name="id" id="edit-id" class="wu-text"/>  
+        <table>         
+            <tr>
+                <td valign="top" align="right">菜品分类名称:</td>
+                <td>
+                <input type="text" name="name" id="edit-name" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写菜品分类名称！' "/></td>
+            </tr> 
+            <tr>
+                <td valign="top" align="right">备注信息:</td>
+                <td><textarea name="remark" id="edit-remark" rows="6" class="wu-textarea" style="width:260px"></textarea></td>
             </tr> 
         </table>
     </form>
@@ -78,19 +100,50 @@
 		//序列化表单数据
 		var data = $('#add-form').serialize();
 		$.ajax({
-			url:'${APP_PATH}/log/add',
+			url:'${APP_PATH}/foodCategory/add',
 			type:"POST",
 			data:data,
 			success:function(result){
 				if(result.success){
 					$.messager.alert('信息提示','添加成功！','info');
-					//清空日志内容
+					//清空菜品分类内容
 					$('#content').val("");
 					$('#wu-dialog').dialog('close');
 					//添加成功后重载数据
 					$('#data-datagrid').datagrid('reload');
 				}else{
-					$.messager.alert('信息提示','添加失败！','info');
+					$.messager.alert('信息提示',result.data,'info');
+				}
+			}
+		});
+	}
+	
+	/**
+	* 修改记录
+	*/
+	function edit(){
+		var validate = $('#edit-form').form("validate");
+		if(!validate){
+			$.messager.alert("消息提示","请检查你的数据！","warning");
+			return;
+		}
+		//序列化表单数据
+		var data = $('#edit-form').serialize();
+		$.ajax({
+			url:'${APP_PATH}/foodCategory/edit',
+			type:"POST",
+			data:data,
+			success:function(result){
+				if(result.success){
+					$.messager.alert('信息提示','修改成功！','info');
+					//清空菜品分类内容
+					$('#edit-name').val("");
+					$('#edit-remark').val("");
+					$('#edit-dialog').dialog('close');
+					//添加成功后重载数据
+					$('#data-datagrid').datagrid('reload');
+				}else{
+					$.messager.alert('信息提示','修改失败！','info');
 				}
 			}
 		});
@@ -101,22 +154,19 @@
 	* 删除记录
 	*/
 	function remove(){
-		var item = $('#data-datagrid').datagrid('getSelections');
+		var item = $('#data-datagrid').datagrid('getSelected');
 		if(item==null||item.length==0){
 			$.messager.alert('信息提示','请选择需要删除的数据！','info');
 			return;
 			}
-		$.messager.confirm('信息提示','确定要删除这'+item.length+'条记录？', function(result){
-			if(result){
-				var ids = '';
-				for(var i=0;i<item.length;i++){
-				     ids+=item[i].id+',';	
-				}
-				$.ajax({
-					url:"${APP_PATH}/log/deleteLog",
+		$.messager.confirm('信息提示','确定要删除菜品分类【'+item.name+'】？', function(result){
+		    if(result){
+			$.ajax({
+					url:"${APP_PATH}/foodCategory/delete",
 					type:"POST",
 					data:{
-						"ids":ids
+						"id":item.id,
+						"name":item.name
 					},
 					success:function(result2){
 						if(result2.success){
@@ -124,7 +174,7 @@
 							//修改成功后重载数据
 							$('#data-datagrid').datagrid('reload');
 						}else{
-							$.messager.alert('提示信息','删除失败！','error');
+							$.messager.alert('提示信息',result2.data,'error');
 						}
 					}
 				});
@@ -140,7 +190,7 @@
 		$('#wu-dialog').dialog({
 			closed: false,
 			modal:true,
-            title: "添加日志信息",
+            title: "添加菜品分类信息",
             buttons: [{
                 text: '确定',
                 iconCls: 'icon-ok',
@@ -152,22 +202,53 @@
                     $('#wu-dialog').dialog('close');                    
                 }
             }],
-            //添加用户时，清空文本框中的数据，需要时使用，因为用户添加时有重复的信息，避免再次输入，可以不清空
-            /*
             onBeforeOpen:function(){
-            	$('#add-form input').val("");
+            	//清空
+            	$('#name').val("");
+            	$('#remark').val("");
             }
-		*/
+        });
+	}
+	
+	//打开修改窗口
+	function openEdit(){
+		//获取选中的记录
+    	var item = $('#data-datagrid').datagrid('getSelected');
+		if(item==null){
+			$.messager.alert('提示信息','请选择要修改的数据！','info');
+			return;
+		}
+		$('#edit-dialog').dialog({
+			closed: false,
+			modal:true,
+            title: "修改菜品分类信息",
+            buttons: [{
+                text: '确定',
+                iconCls: 'icon-ok',
+                handler: edit
+            }, {
+                text: '取消',
+                iconCls: 'icon-cancel',
+                handler: function () {
+                    $('#edit-dialog').dialog('close');                    
+                }
+            }],
+            onBeforeOpen:function(){
+            	//数据回显
+            	$("#edit-id").val(item.id);
+            	$('#edit-name').val(item.name);
+            	$('#edit-remark').val(item.remark);
+            }
         });
 	}
 	
 	
 	//实现模糊查询
 		$('#search-btn').click(function(){
-			var content = $('#search-name').val();
+			var name = $('#search-name').val();
 			var option = {
-		       content:content
-			}
+		       name:name
+			};
 			$('#data-datagrid').datagrid('reload',option);
 	});
 	
@@ -176,9 +257,9 @@
 	* Name 载入数据
 	*/
 	$('#data-datagrid').datagrid({
-		url:'${APP_PATH}/log/listData',
+		url:'${APP_PATH}/foodCategory/listData',
 		rownumbers:true,//是否显示行号
-		singleSelect:false,//是否只支持单选,true支持单选，false支持多选
+		singleSelect:true,//是否只支持单选,true支持单选，false支持多选
 		pageSize:20,//每页显示的记录条数           
 		pagination:true,//是否开启分页功能
 		multiSort:true,
@@ -186,8 +267,8 @@
 		fit:true,
 		columns:[[
 			{ field:'chk',checkbox:true},
-			{ field:'content',title:'日志内容',align:'center',width:100,sortable:true},
-			{ field:'createTimeStr',title:'时间',align:'center',width:100,sortable:true}
+			{ field:'name',title:'菜品分类内容',align:'center',width:100,sortable:true},
+			{ field:'remark',title:'备注信息',align:'center',width:100,sortable:true},
 		]],	
 	});
 </script>
