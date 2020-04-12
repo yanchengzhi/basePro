@@ -182,7 +182,7 @@
 					//添加成功后重载数据
 					$('#data-datagrid').treegrid('reload');
 				}else{
-					$.messager.alert('信息提示','添加失败！','info');
+					$.messager.alert('信息提示','添加失败！','warning');
 				}
 			}
 		});
@@ -270,7 +270,7 @@
 					//修改成功后重载数据
 					$('#data-datagrid').treegrid('reload');
 				}else{
-					$.messager.alert('提示信息','修改失败！','info');
+					$.messager.alert('提示信息','修改失败！','warning');
 				}
 			}
 		});
@@ -298,7 +298,7 @@
 							//修改成功后重载数据
 							$('#data-datagrid').treegrid('reload');
 						}else{
-							$.messager.alert('提示信息',result2.data,'error');
+							$.messager.alert('提示信息',result2.data,'warning');
 						}
 					}
 				});

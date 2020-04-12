@@ -90,7 +90,7 @@
 </div>
 
 <!-- 选择权限弹窗 -->
-<div id="select-authority-dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:220px;height:300px;padding:10px;">
+<div id="select-authority-dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:220px;height:450px;padding:10px;">
    <!-- easyui的Tree容器 -->
    <ul id="authority-tree" url="${APP_PATH}/auth/getAllMenu" checkbox="true"></ul>
 </div>
@@ -118,7 +118,7 @@
 					//添加成功后重载数据
 					$('#data-datagrid').datagrid('reload');
 				}else{
-					$.messager.alert('信息提示','添加失败！','info');
+					$.messager.alert('信息提示','添加失败！','warning');
 				}
 			}
 		});
@@ -201,7 +201,7 @@
 					//修改成功后重载数据
 					$('#data-datagrid').datagrid('reload');
 				}else{
-					$.messager.alert('提示信息','修改失败！','info');
+					$.messager.alert('提示信息','修改失败！','warning');
 				}
 			}
 		});
@@ -229,7 +229,7 @@
 							//修改成功后重载数据
 							$('#data-datagrid').datagrid('reload');
 						}else{
-							$.messager.alert('提示信息',result2.data,'error');
+							$.messager.alert('提示信息',result2.data,'warning');
 						}
 					}
 				});

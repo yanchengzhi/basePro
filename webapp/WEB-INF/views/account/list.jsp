@@ -43,7 +43,9 @@
             </c:forEach>
         </div>
         <div class="wu-toolbar-search">
-            <label>菜品分类名称：</label><input class="wu-text" id="search-name" style="width:100px">&nbsp;&nbsp;&nbsp;
+            <label>用户名：</label><input class="wu-text" id="search-name" style="width:100px">&nbsp;&nbsp;&nbsp;
+            <label>真实姓名：</label><input class="wu-text" id="search-realName" style="width:100px">&nbsp;&nbsp;&nbsp;
+            <label>住址：</label><input class="wu-text" id="search-address" style="width:100px">&nbsp;&nbsp;&nbsp;
             <a href="#" class="easyui-linkbutton" id="search-btn" iconCls="icon-search">搜索</a>
         </div>
     </div>
@@ -54,14 +56,26 @@
 <!-- 添加弹窗 -->
 <div id="wu-dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:450px; padding:10px;">
 	<form id="add-form" method="post">
-        <table>           
+        <table>
             <tr>
-                <td valign="top" align="right">菜品分类名称:</td>
-                <td><input type="text" name="name" id="name" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写菜品分类名称！' "/></td>
+                <td width="60" align="right">用户名:</td>
+                <td><input type="text" name="name" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写用户名！' "/></td>
+            </tr>           
+            <tr>
+                <td align="right">密码:</td>
+                <td><input type="text" name="password" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请设置密码！' "/></td>
             </tr>
             <tr>
-                <td valign="top" align="right">备注信息:</td>
-                <td><textarea name="remark" id="remark" rows="6" class="wu-textarea" style="width:260px"></textarea></td>
+                <td width="70" align="right">真实姓名：</td>
+                <td><input type="text" name="realName" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写真实姓名！' "/></td>
+            </tr> 
+            <tr>
+                <td width="60" align="right">手机号:</td>
+                <td><input type="text" name="phone" maxlength="11" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写手机号！' "/></td>
+            </tr>
+            <tr>
+                <td width="60" align="right">住址:</td>
+                <td><input type="text" name="address" class="wu-text easyui-validatebox"/></td>
             </tr> 
         </table>
     </form>
@@ -70,16 +84,28 @@
 <!-- 修改弹窗 -->
 <div id="edit-dialog" class="easyui-dialog" data-options="closed:true,iconCls:'icon-save'" style="width:450px; padding:10px;">
 	<form id="edit-form" method="post">
-	    <input type="hidden" name="id" id="edit-id" class="wu-text"/>  
-        <table>         
+	    <!-- 隐藏域的文本框，无需显示，用于修改记录传递id值 -->
+	    <input type="hidden" name="id" id="edit-id"/>
+        <table>
             <tr>
-                <td valign="top" align="right">菜品分类名称:</td>
-                <td>
-                <input type="text" name="name" id="edit-name" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写菜品分类名称！' "/></td>
+                <td width="60" align="right">用户名:</td>
+                <td><input type="text" name="name" id="edit-name" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写用户名！' "/></td>
+            </tr>           
+            <tr>
+                <td align="right">密码:</td>
+                <td><input type="text" name="password" id="edit-password" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请设置密码！' "/></td>
+            </tr>
+            <tr>
+                <td width="60" align="right">真实姓名：</td>
+                <td><input type="text" name="realName" id="edit-realName" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写真实姓名！' "/></td>
             </tr> 
             <tr>
-                <td valign="top" align="right">备注信息:</td>
-                <td><textarea name="remark" id="edit-remark" rows="6" class="wu-textarea" style="width:260px"></textarea></td>
+                <td width="60" align="right">手机号:</td>
+                <td><input type="text" name="phone" id="edit-phone" maxlength="11" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写手机号！' "/></td>
+            </tr>
+            <tr>
+                <td width="60" align="right">住址:</td>
+                <td><input type="text" name="address" id="edit-address" class="wu-text easyui-validatebox" data-options="required:true,missingMessage:'请填写住址信息！' "/></td>
             </tr> 
         </table>
     </form>
@@ -100,14 +126,12 @@
 		//序列化表单数据
 		var data = $('#add-form').serialize();
 		$.ajax({
-			url:'${APP_PATH}/foodCategory/add',
+			url:'${APP_PATH}/account/add',
 			type:"POST",
 			data:data,
 			success:function(result){
 				if(result.success){
 					$.messager.alert('信息提示','添加成功！','info');
-					//清空菜品分类内容
-					$('#content').val("");
 					$('#wu-dialog').dialog('close');
 					//添加成功后重载数据
 					$('#data-datagrid').datagrid('reload');
@@ -122,51 +146,46 @@
 	* 修改记录
 	*/
 	function edit(){
-		var validate = $('#edit-form').form("validate");
+		var validate = $('#edit-form').form('validate');
 		if(!validate){
-			$.messager.alert("消息提示","请检查你的数据！","warning");
-			return;
+			$.messager.alert('提示信息','请检查你的数据！','warning');
 		}
-		//序列化表单数据
+		//序列化表单
 		var data = $('#edit-form').serialize();
 		$.ajax({
-			url:'${APP_PATH}/foodCategory/edit',
+			url:"${APP_PATH}/account/edit",
 			type:"POST",
 			data:data,
 			success:function(result){
 				if(result.success){
-					$.messager.alert('信息提示','修改成功！','info');
-					//清空菜品分类内容
-					$('#edit-name').val("");
-					$('#edit-remark').val("");
+					$.messager.alert('提示信息','修改成功！','info');
+					//关闭弹窗
 					$('#edit-dialog').dialog('close');
-					//添加成功后重载数据
+					//修改成功后重载数据
 					$('#data-datagrid').datagrid('reload');
 				}else{
-					$.messager.alert('信息提示','修改失败！','warning');
+					$.messager.alert('提示信息',result.data,'warning');
 				}
 			}
 		});
 	}
-	
 	
 	/**
 	* 删除记录
 	*/
 	function remove(){
 		var item = $('#data-datagrid').datagrid('getSelected');
-		if(item==null||item.length==0){
+		if(item==null){
 			$.messager.alert('信息提示','请选择需要删除的数据！','info');
 			return;
 			}
-		$.messager.confirm('信息提示','确定要删除菜品分类【'+item.name+'】？', function(result){
-		    if(result){
-			$.ajax({
-					url:"${APP_PATH}/foodCategory/delete",
+		$.messager.confirm('信息提示','确定要删除客户【'+item.name+'】这条记录？', function(result){
+			if(result){
+				$.ajax({
+					url:"${APP_PATH}/account/delete",
 					type:"POST",
 					data:{
-						"id":item.id,
-						"name":item.name
+						"id":item.id
 					},
 					success:function(result2){
 						if(result2.success){
@@ -190,7 +209,7 @@
 		$('#wu-dialog').dialog({
 			closed: false,
 			modal:true,
-            title: "添加菜品分类信息",
+            title: "添加客户信息",
             buttons: [{
                 text: '确定',
                 iconCls: 'icon-ok',
@@ -202,26 +221,29 @@
                     $('#wu-dialog').dialog('close');                    
                 }
             }],
+            //添加用户时，清空文本框中的数据，需要时使用，因为用户添加时有重复的信息，避免再次输入，可以不清空
+            /*
             onBeforeOpen:function(){
-            	//清空
-            	$('#name').val("");
-            	$('#remark').val("");
+            	$('#add-form input').val("");
             }
+		*/
         });
 	}
 	
-	//打开修改窗口
+	/**
+	* 打开修改窗口
+	*/
 	function openEdit(){
 		//获取选中的记录
-    	var item = $('#data-datagrid').datagrid('getSelected');
+		var item = $('#data-datagrid').datagrid('getSelected');
 		if(item==null){
-			$.messager.alert('提示信息','请选择要修改的数据！','info');
+			$.messager.alert('信息提示','请选择需要修改的数据！','info');
 			return;
-		}
+			}	
 		$('#edit-dialog').dialog({
 			closed: false,
 			modal:true,
-            title: "修改菜品分类信息",
+            title: "修改用户信息",
             buttons: [{
                 text: '确定',
                 iconCls: 'icon-ok',
@@ -233,21 +255,28 @@
                     $('#edit-dialog').dialog('close');                    
                 }
             }],
+            //修改的记录数据回显
             onBeforeOpen:function(){
-            	//数据回显
-            	$("#edit-id").val(item.id);
+            	$('#edit-id').val(item.id);
             	$('#edit-name').val(item.name);
-            	$('#edit-remark').val(item.remark);
+            	$('#edit-password').val(item.password);
+            	$('#edit-realName').val(item.realName);
+            	$('#edit-phone').val(item.phone);
+            	$('#edit-address').val(item.address);
             }
         });
-	}
-	
+	}	
 	
 	//实现模糊查询
 		$('#search-btn').click(function(){
 			var name = $('#search-name').val();
+			var realName = $('#search-realName').val();
+			var address = $('#search-address').val();
+			//这里使用json的格式来传值
 			var option = {
-		       name:name
+					name:name,
+					realName:realName,
+					address:address
 			};
 			$('#data-datagrid').datagrid('reload',option);
 	});
@@ -257,7 +286,7 @@
 	* Name 载入数据
 	*/
 	$('#data-datagrid').datagrid({
-		url:'${APP_PATH}/foodCategory/listData',
+		url:'${APP_PATH}/account/listData',
 		rownumbers:true,//是否显示行号
 		singleSelect:true,//是否只支持单选,true支持单选，false支持多选
 		pageSize:20,//每页显示的记录条数           
@@ -267,9 +296,20 @@
 		fit:true,
 		columns:[[
 			{ field:'chk',checkbox:true},
-			{ field:'name',title:'菜品分类内容',align:'center',width:100,sortable:true},
-			{ field:'remark',title:'备注信息',align:'center',width:100,sortable:true},
-		]],	
+			{ field:'name',title:'用户名',align:'center',width:100,sortable:true},
+			{ field:'realName',title:'真实姓名',align:'center',width:100},
+			{ field:'phone',title:'联系方式',align:'center',width:200},
+			{ field:'address',title:'住址',align:'center',width:200},
+		]],
+		//将文字内容加入到按钮中，连接为一个整体
+		onLoadSuccess:function(data){
+			$('#data-datagrid').datagrid('fixRowHeight');//固定行高
+			$('.authority-edit').linkbutton({
+				text:'编辑权限',
+				plain:true,
+				iconCls:'icon-edit'
+			});
+		}
 	});
 </script>
 </body>
