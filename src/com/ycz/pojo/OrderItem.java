@@ -16,7 +16,7 @@ public class OrderItem {
     private String foodName;//商品名称
     private String foodImage;//商品图片
     private float price;//商品单价
-    private float foodNum;//商品数量
+    private int foodNum;//商品数量
     private float money;//商品总金额
     
     public Long getId() {
@@ -68,11 +68,11 @@ public class OrderItem {
         this.price = price;
     }
     
-    public float getFoodNum() {
+    public int getFoodNum() {
         return foodNum;
     }
     
-    public void setFoodNum(float foodNum) {
+    public void setFoodNum(int foodNum) {
         this.foodNum = foodNum;
     }
     

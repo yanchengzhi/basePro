@@ -46,4 +46,15 @@ public class FoodServiceImpl implements FoodService {
         return foodDao.queryByName(name);
     }
 
+    @Override
+    public Food queryById(Long id) {
+        return foodDao.queryById(id);
+    }
+
+    @Override
+    public void updateSales(Long id,Long num) {
+        foodDao.updateSales(id,num);    
+    }
+    
+
 }

@@ -18,5 +18,7 @@ public interface FoodCategoryService {
     void edit(FoodCategory foodCategory);
 
     void delete(Long id);
+    
+    List<FoodCategory> findAll();
 
 }

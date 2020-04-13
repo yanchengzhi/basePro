@@ -127,7 +127,7 @@ public class FoodController {
                 lService.addLog(role.getName(), currentUser.getUsername(),
                         "添加了新的菜品【" + food.getName() + "】！");
             } else {// 否则提示用户
-                result.setData("该分类已存在！");
+                result.setData("该菜品已存在！");
                 result.setSuccess(false);
             }
         } catch (Exception e) {

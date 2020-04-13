@@ -46,4 +46,9 @@ public class AccountServiceImpl implements AccountService {
         return acDao.queryByName(name);
     }
 
+    @Override
+    public Account validateAccount(Account account) {
+        return acDao.validateAccount(account);
+    }
+
 }

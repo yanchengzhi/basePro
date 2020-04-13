@@ -4,6 +4,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ycz.dao.FoodCategoryDao">
 
+<!-- FoodCategory类对Food类为一对多映射 -->
+  <resultMap id="foodListMap" type="com.ycz.pojo.FoodCategory">
+     <id property="id" column="fc_id" javaType="Long" jdbcType="INTEGER"/>
+     <result property="name" column="fc_name" javaType="String" jdbcType="VARCHAR"/>
+     <result property="remark" column="fc_remark" javaType="String" jdbcType="VARCHAR"/>
+     <!-- 一对多使用collection -->
+     <collection property="foodList" ofType="com.ycz.pojo.Food">
+         <id property="id" column="f_id" javaType="Long" jdbcType="INTEGER"/>
+         <result property="name" column="f_name" javaType="String" jdbcType="VARCHAR"/>
+         <result property="categoryId" column="f_categoryId" javaType="Long" jdbcType="INTEGER"/>
+         <result property="price" column="f_price" javaType="float" jdbcType="FLOAT"/>
+         <result property="sales" column="f_sales" javaType="Integer" jdbcType="INTEGER"/>
+         <result property="imageUrl" column="f_imageUrl" javaType="String" jdbcType="VARCHAR"/>
+         <result property="description" column="f_description" javaType="String" jdbcType="VARCHAR"/>
+     </collection>
+  </resultMap>
+
    <!-- 获取总的记录条数 -->
    <select id="getTotal" resultType="int" parameterType="map">
       select count(*) from food_category
@@ -23,6 +40,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </if>
       </where>
       limit #{offset},#{pageSize}
+   </select>
+   
+   <!-- 获取所有菜品分类信息 -->
+   <select id="findAll" resultMap="foodListMap" parameterType="map">
+      select fc.id fc_id,fc.name fc_name,fc.remark fc_remark,
+      f.id f_id,f.name f_name,f.category_id f_categoryId,f.price f_price,
+      f.sales f_sales,f.image_url f_imageUrl,f.description f_description
+      from food_category fc,food f where fc.id = f.category_id
    </select>
     
 </mapper>

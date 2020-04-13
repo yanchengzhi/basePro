@@ -16,13 +16,14 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.ycz.pojo.Account;
 import com.ycz.pojo.AjaxResult;
-import com.ycz.pojo.Food;
 import com.ycz.pojo.Menu;
+import com.ycz.pojo.Order;
 import com.ycz.pojo.Page;
 import com.ycz.pojo.Role;
 import com.ycz.pojo.User;
 import com.ycz.service.AccountService;
 import com.ycz.service.LogService;
+import com.ycz.service.OrderService;
 import com.ycz.service.RoleService;
 import com.ycz.util.MenuUtil;
 /**
@@ -45,6 +46,55 @@ public class AccountController {
     
     @Autowired
     private LogService lService;
+    
+    @Autowired
+    private OrderService oService;
+    
+    /**
+     * 
+     * @Description (跳往登录界面)
+     * @return
+     */
+    @RequestMapping("login")
+    public ModelAndView login() {
+        ModelAndView mav = new ModelAndView("/home/user/login");
+        return mav;
+    }
+    
+    /**
+     * 
+     * @Description (跳往用户中心首页)
+     * @return
+     */
+    @RequestMapping("index")
+    public ModelAndView index(HttpSession session) {
+        Account account = (Account) session.getAttribute("account");
+        ModelAndView mav = new ModelAndView();
+        if(account==null) {
+            mav.setViewName("/home/user/login");
+        }else {
+            Map<String,Object> map = new HashMap<String,Object>();
+            map.put("accountId", account.getId());
+            map.put("offset",0);
+            map.put("pageSize",9999);
+            List<Order> oList = oService.findList(map);
+            mav.addObject("orderList",oList);
+            mav.setViewName("/home/user/index");
+        }
+        return mav;
+    }
+    
+    /**
+     * 
+     * @Description (跳往注册界面)
+     * @return
+     */
+    @RequestMapping("registe")
+    public ModelAndView registe() {
+        ModelAndView mav = new ModelAndView("/home/user/registe");
+        return mav;
+    }
+    
     
     /**
      * 
@@ -173,6 +223,100 @@ public class AccountController {
             result2.setSuccess(false);
         }
         return result2;
+    }
+    
+    @ResponseBody
+    @RequestMapping("getUserAddress")
+    public AjaxResult getUserAddress(HttpServletRequest request) {
+        AjaxResult result = new AjaxResult();
+            //判断客户是否登录
+            Account account = (Account)request.getSession().getAttribute("account");
+            if(account==null) {
+                result.setData("用户未登陆，请先登录！");
+                result.setSuccess(false);
+            }else {
+                result.setData(account);
+                result.setSuccess(true);
+            }
+        return result;
+    }
+    
+    /**
+     * 
+     * @Description (客户注册账号)
+     * @param account
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("registeDo")
+    public AjaxResult registeDo(Account account) {
+        AjaxResult result = new AjaxResult();
+        //查询用户名是否被注册
+        Account acco = acService.queryByName(account.getName());
+        if(acco==null) {//可以注册
+            acService.add(account);
+            result.setSuccess(true);
+        }else {//用户名被占用
+            result.setData("用户名被占用！");
+            result.setSuccess(false);
+        }
+        return result;
+    }
+    
+    /**
+     * 
+     * @Description (登录验证)
+     * @param account
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("loginDo")
+    public AjaxResult loginDo(Account account,HttpServletRequest request) {
+        AjaxResult result = new AjaxResult();
+        Account acco = acService.validateAccount(account);
+        if(acco==null) {//验证不通过
+            //进一步判断
+            Account acco2 = acService.queryByName(account.getName());
+            if(acco2==null) {//用户尚未注册
+                result.setData("该用户尚未注册，请先进行注册！");
+                result.setSuccess(false);
+            }else {//密码错误
+                result.setData("密码错误，请重新输入！");
+                result.setSuccess(false); 
+            }
+        }else {//验证通过
+            //登录成功，存到session域中
+            request.getSession().setAttribute("account", acco);
+            result.setSuccess(true);
+        }
+        return result;
+    }
+    
+    /**
+     * 
+     * @Description (修改配送信息)
+     * @param account
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("updateInfo")
+    public AjaxResult updateInfo(Account account,HttpSession session) {
+        //获取当前用户
+        Account acco = (Account) session.getAttribute("account");   
+        AjaxResult result = new AjaxResult();
+        try {
+            acco.setRealName(account.getRealName());
+            acco.setPassword(account.getPassword());
+            acco.setPhone(account.getPhone());
+            acco.setAddress(account.getAddress());
+            acService.edit(acco);
+            result.setSuccess(true);
+            lService.addLog("客户", acco.getName(), "修改了自己的基本信息！");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setSuccess(false);
+        }
+        return result;
     }
 
 }

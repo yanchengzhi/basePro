@@ -23,4 +23,9 @@ public interface FoodDao {
     @Select("select * from food where name=#{name}")
     Food queryByName(String name);
 
+    @Select("select * from food where id=#{id}")
+    Food queryById(Long id);
+
+    void updateSales(Long id,Long num);
+
 }

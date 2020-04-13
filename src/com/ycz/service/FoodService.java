@@ -18,5 +18,9 @@ public interface FoodService {
     List<Food> findList(Map<String,Object> map);
 
     Food queryByName(String name);
+    
+    Food queryById(Long id);
+    
+    void updateSales(Long id,Long num);//更新销量
 
 }

@@ -1,5 +1,7 @@
 package com.ycz.pojo;
 
+import java.util.List;
+
 /**
  * 
  * @ClassName FoodCategory
@@ -12,6 +14,7 @@ public class FoodCategory {
     
     private Long id;//主键ID
     private String name;//菜品分类名称
+    private List<Food> foodList;//该分类下的所有菜品
     private String remark;//备注内容
     
     public Long getId() {
@@ -36,6 +39,16 @@ public class FoodCategory {
     
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    
+    public List<Food> getFoodList() {
+        return foodList;
+    }
+
+    
+    public void setFoodList(List<Food> foodList) {
+        this.foodList = foodList;
     }
 
     

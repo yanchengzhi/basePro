@@ -24,6 +24,7 @@ public class Order {
     private float money;//总金额
     private Date createTime;//下单时间
     private String createTimeStr;
+    private int status;//商品状态：0为未配送，1为配送中，2为已完成
     private List<OrderItem> orderItems;//订单子项集合
     
     public String getCreateTimeStr() {
@@ -37,8 +38,6 @@ public class Order {
     public void setCreateTimeStr(String createTimeStr) {
         this.createTimeStr = createTimeStr;
     }
-
-    private int status;//商品状态：0为未配送，1为配送中，2为已完成
     
     public Long getId() {
         return id;

@@ -38,7 +38,7 @@
         </div>
         <div class="wu-header-right">
         	<p><strong class="easyui-tooltip" title="0条未读消息">${role.name}【${currentUser.username}】</strong>，欢迎您！</p>
-            <p><a href="${APP_PATH}/system/logout">【安全退出】</a></p>
+            <p><a href="${APP_PATH}/index/index" target="_blank">网站首页</a>|<a href="#">支持论坛</a>|<a href="#">帮助中心</a>|<a href="${APP_PATH}/system/logout">【安全退出】</a></p>
         </div>
     </div>
     <!-- end of header -->

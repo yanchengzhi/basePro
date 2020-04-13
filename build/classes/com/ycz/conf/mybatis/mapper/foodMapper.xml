@@ -17,6 +17,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
      image_url=#{imageUrl},description=#{description} where id=#{id}
    </update>
    
+   <!-- 更新销量 -->
+   <update id="updateSales" parameterType="Long">
+      update food set sales = sales + #{arg1} where id=#{arg0}
+   </update>
+   
    <!-- 获取总的记录条数 -->
    <select id="getTotal" resultType="int" parameterType="map">
      select count(*) from food

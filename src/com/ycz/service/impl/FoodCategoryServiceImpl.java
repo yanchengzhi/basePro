@@ -46,4 +46,9 @@ public class FoodCategoryServiceImpl implements FoodCategoryService {
         fDao.delete(id);
     }
 
+    @Override
+    public List<FoodCategory> findAll() {
+        return fDao.findAll();
+    }
+
 }

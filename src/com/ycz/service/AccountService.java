@@ -19,4 +19,7 @@ public interface AccountService {
     
     Account queryByName(String name);
 
+    Account validateAccount(Account account);
+    
+
 }

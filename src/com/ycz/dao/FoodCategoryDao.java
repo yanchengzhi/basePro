@@ -25,4 +25,6 @@ public interface FoodCategoryDao {
     @Select("delete from food_category where id=#{id}")
     void delete(Long id);
 
+    List<FoodCategory> findAll();
+
 }

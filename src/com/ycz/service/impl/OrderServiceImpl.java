@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.ycz.dao.OrderDao;
 import com.ycz.pojo.Order;
+import com.ycz.pojo.OrderItem;
 import com.ycz.service.OrderService;
 
 @Service
@@ -39,6 +40,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void delete(Long id) {
        oDao.delete(id); 
+    }
+
+    @Override
+    public void addItem(OrderItem item) {
+        oDao.addItem(item);
     }
 
 }

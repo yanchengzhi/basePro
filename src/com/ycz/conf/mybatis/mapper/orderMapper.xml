@@ -38,9 +38,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   </resultMap>
   
   <!-- 添加订单 -->
-  <insert id="add" parameterType="com.ycz.pojo.Order">
+  <!-- 可将刚插入的记录ID返回 -->
+  <insert id="add" useGeneratedKeys="true" keyProperty="id" parameterType="com.ycz.pojo.Order">
      insert into orders(account_id,receive_name,phone,address,product_num,money,create_time,status) values(
      #{accountId},#{receiveName},#{phone},#{address},#{productNum},#{money},#{createTimeStr},#{status}
+     )
+  </insert>
+  
+  <!-- 添加订单子项 -->
+  <insert id="addItem" useGeneratedKeys="true" keyProperty="id" parameterType="com.ycz.pojo.OrderItem">
+     insert into order_item(order_id,food_id,food_name,food_image,price,food_num,money) values(
+      #{orderId},#{foodId},#{foodName},#{foodImage},#{price},#{foodNum},#{money}
      )
   </insert>
   

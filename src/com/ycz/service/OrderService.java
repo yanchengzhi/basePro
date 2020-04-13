@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ycz.pojo.Order;
+import com.ycz.pojo.OrderItem;
 
 public interface OrderService {
     
@@ -16,5 +17,7 @@ public interface OrderService {
     List<Order> findList(Map<String,Object>map);
     
     void delete(Long id);
+    
+    void addItem(OrderItem item);//添加订单的子项
 
 }

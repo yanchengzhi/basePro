@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Select;
 
 import com.ycz.pojo.Order;
+import com.ycz.pojo.OrderItem;
 
 public interface OrderDao {
 
@@ -19,5 +20,7 @@ public interface OrderDao {
 
     @Select("delete * from order where id=#{id}")
     void delete(Long id);
+
+    void addItem(OrderItem item);
 
 }

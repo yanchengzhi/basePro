@@ -23,4 +23,7 @@ public interface AccountDao {
     @Select("select * from account where name=#{name}")
     Account queryByName(String name);
 
+    @Select("select * from account where name=#{name} and password=#{password}")
+    Account validateAccount(Account account);
+
 }
