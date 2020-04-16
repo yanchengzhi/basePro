@@ -10,7 +10,7 @@ package com.ycz.pojo;
  */
 public class Account {
     
-    private Long id;//客户主键ID
+    private Long id;//客户主键
     private String name;//登录名
     private String password;//登录密码
     private String realName;//真实姓名
